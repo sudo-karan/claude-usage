@@ -1,0 +1,47 @@
+# Built application files
+*.apk
+*.aar
+*.ap_
+*.aab
+
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+release/
+
+# Gradle files
+.gradle/
+build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Log Files
+*.log
+
+# Android Studio / IntelliJ
+*.iml
+.idea/
+misc.xml
+deploymentTargetDropDown.xml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Keystore files (keep these out of VCS)
+*.jks
+*.keystore
+!debug.keystore
+
+# Kotlin
+.kotlin/
+
+# macOS / misc
+.DS_Store
