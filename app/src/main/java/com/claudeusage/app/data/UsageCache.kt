@@ -22,16 +22,19 @@ class UsageCache(context: Context) {
         return runCatching { json.decodeFromString(UsageSnapshot.serializer(), raw) }.getOrNull()
     }
 
-    /** Records the reset instant we last alerted on for a meter. */
-    fun lastNotifiedReset(meterId: String): Long = prefs.getLong(KEY_NOTIFIED + meterId, 0L)
+    /**
+     * Last usage fraction we observed for a meter, used to detect a real reset
+     * (usage dropping back toward zero). Returns -1f when never seen.
+     */
+    fun lastSeenFraction(meterId: String): Float = prefs.getFloat(KEY_FRACTION + meterId, -1f)
 
-    fun setLastNotifiedReset(meterId: String, resetAtEpochMs: Long) {
-        prefs.edit().putLong(KEY_NOTIFIED + meterId, resetAtEpochMs).apply()
+    fun setLastSeenFraction(meterId: String, fraction: Float) {
+        prefs.edit().putFloat(KEY_FRACTION + meterId, fraction).apply()
     }
 
     private companion object {
         const val FILE = "claude_usage_cache"
         const val KEY_SNAPSHOT = "snapshot_json"
-        const val KEY_NOTIFIED = "notified_reset_"
+        const val KEY_FRACTION = "last_fraction_"
     }
 }
