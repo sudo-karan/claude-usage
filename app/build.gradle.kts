@@ -37,8 +37,14 @@ android {
             isMinifyEnabled = false
         }
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            // Minification is intentionally off. R8 full-mode chokes on the optional
+            // dependencies Tink (via androidx.security-crypto) only references at
+            // compile time (Error Prone, Joda-Time, …), and this personal utility
+            // gains nothing from shrinking. Keeping it off guarantees a reliable,
+            // installable release APK. proguard-rules.pro is retained for anyone who
+            // re-enables minification later.
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
