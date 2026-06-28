@@ -46,6 +46,7 @@ import com.claudeusage.app.ui.theme.AccentWeekly
 import com.claudeusage.app.ui.theme.Coral
 import com.claudeusage.app.ui.theme.OnInk
 import com.claudeusage.app.ui.theme.OnInkMuted
+import com.claudeusage.app.ui.theme.SuccessGreen
 import com.claudeusage.app.ui.theme.TrackNeutral
 import com.claudeusage.app.util.TimeFormat
 
@@ -87,8 +88,12 @@ private fun WidgetBody(snapshot: UsageSnapshot) {
             Text(
                 "Claude Usage",
                 style = TextStyle(color = ColorProvider(OnInk), fontSize = 14.sp, fontWeight = FontWeight.Medium),
-                modifier = GlanceModifier.defaultWeight(),
             )
+            Spacer(GlanceModifier.width(8.dp))
+            SourcePill(snapshot.isLive)
+            Spacer(GlanceModifier.defaultWeight())
+            RefreshButton()
+            Spacer(GlanceModifier.width(6.dp))
             PingPill()
         }
 
@@ -150,9 +155,51 @@ private fun PingPill() {
     }
 }
 
+@androidx.compose.runtime.Composable
+private fun SourcePill(isLive: Boolean) {
+    val accent = if (isLive) SuccessGreen else OnInkMuted
+    Box(
+        modifier = GlanceModifier
+            .background(ColorProvider(accent.copy(alpha = 0.18f)))
+            .cornerRadius(50.dp)
+            .padding(horizontal = 8.dp, vertical = 3.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            if (isLive) "LIVE" else "SAMPLE",
+            style = TextStyle(color = ColorProvider(accent), fontSize = 10.sp, fontWeight = FontWeight.Bold),
+        )
+    }
+}
+
+@androidx.compose.runtime.Composable
+private fun RefreshButton() {
+    Box(
+        modifier = GlanceModifier
+            .cornerRadius(50.dp)
+            .padding(6.dp)
+            .clickable(actionRunCallback<RefreshActionCallback>()),
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(
+            provider = ImageProvider(R.drawable.ic_refresh),
+            contentDescription = "Refresh",
+            modifier = GlanceModifier.size(16.dp),
+        )
+    }
+}
+
 /** Background action for the widget's Ping pill. */
 class PingActionCallback : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         PingClaude.ping(context)
+    }
+}
+
+/** Refreshes usage from the saved session, then repaints all widgets. */
+class RefreshActionCallback : ActionCallback {
+    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
+        runCatching { Graph.repository(context).refresh() }
+        runCatching { UsageWidget().updateAll(context) }
     }
 }

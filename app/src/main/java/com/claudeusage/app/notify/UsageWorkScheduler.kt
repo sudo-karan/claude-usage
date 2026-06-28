@@ -20,14 +20,16 @@ object UsageWorkScheduler {
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()
 
-    /** Keeps usage + widget fresh roughly every 30 minutes. Idempotent. */
+    /** Keeps usage + widget fresh every 15 minutes (WorkManager's floor). Idempotent. */
     fun ensurePeriodic(context: Context) {
-        val request = PeriodicWorkRequestBuilder<RefreshWorker>(30, TimeUnit.MINUTES)
+        val request = PeriodicWorkRequestBuilder<RefreshWorker>(15, TimeUnit.MINUTES)
             .setConstraints(networkConstraint)
             .build()
+        // UPDATE (not KEEP) so an existing 30-min schedule from older installs
+        // is replaced with the 15-min cadence without losing the unique work.
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             PERIODIC_NAME,
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.UPDATE,
             request,
         )
     }
