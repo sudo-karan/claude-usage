@@ -50,10 +50,11 @@ jobs:
       - name: Build debug + release APKs
         run: ./gradlew assembleDebug assembleRelease --stacktrace
 
-      - name: Stage APKs
+      - name: Stage APK
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/debug/app-debug.apk dist/ClaudeUsage-debug.apk
+          # Debug still builds above as a compile check, but only the release
+          # APK is published to keep the release page to a single download.
           cp app/build/outputs/apk/release/app-release.apk dist/ClaudeUsage-release.apk
           ls -la dist
 

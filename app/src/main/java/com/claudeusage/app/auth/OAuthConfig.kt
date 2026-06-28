@@ -26,7 +26,11 @@ object OAuthConfig {
     /** Custom-scheme redirect handled by OAuthRedirectActivity. */
     const val REDIRECT_URI_APP = "claudeusage://oauth/callback"
 
-    val SCOPES = listOf("org:create_api_key", "user:profile", "user:inference")
+    // Subscription (claude.ai) login must NOT request `org:create_api_key` —
+    // that scope only applies to the Console / API-key flow and causes claude.ai
+    // to reject the authorize request ("Invalid request format" / "Unknown scope").
+    // These two are also all we need to read profile + usage.
+    val SCOPES = listOf("user:inference", "user:profile")
 
     /** Header values Claude Code sends alongside the bearer token. */
     const val ANTHROPIC_VERSION = "2023-06-01"
