@@ -1,6 +1,7 @@
 package com.claudeusage.app.ui
 
 import android.app.Application
+import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.claudeusage.app.Graph
