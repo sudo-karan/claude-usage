@@ -44,10 +44,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import android.content.Intent
 import com.claudeusage.app.R
 import com.claudeusage.app.ping.PingClaude
+import com.claudeusage.app.web.WebLoginActivity
 import com.claudeusage.app.ui.components.MeterRow
 import com.claudeusage.app.ui.components.SourceBadge
 import com.claudeusage.app.ui.theme.Coral
@@ -66,6 +70,10 @@ fun HomeScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = androidx.compose.ui.platform.LocalContext.current
+
+    val loginLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { viewModel.onReturnedFromLogin() }
 
     // Tick once a minute so the reset countdowns stay current.
     var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
@@ -103,7 +111,11 @@ fun HomeScreen(
             }
 
             if (!state.isLoggedIn) {
-                ConnectBanner(onSignIn = viewModel::openAuthSheet)
+                ConnectBanner(
+                    onSignIn = {
+                        loginLauncher.launch(Intent(context, WebLoginActivity::class.java))
+                    },
+                )
             }
 
             UsagePanel(state = state, now = now)
@@ -112,14 +124,6 @@ fun HomeScreen(
 
             FooterRow(capturedAt = state.snapshot.capturedAtEpochMs, now = now)
         }
-    }
-
-    if (state.authInProgress) {
-        AuthSheet(
-            onDismiss = viewModel::cancelLogin,
-            onOpenAuthorize = { CustomTab.open(context, viewModel.beginLogin()) },
-            onSubmitCode = viewModel::submitAuthCode,
-        )
     }
 }
 
