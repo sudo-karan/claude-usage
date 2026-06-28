@@ -1,6 +1,7 @@
 package com.claudeusage.app.notify
 
 import android.content.Context
+import androidx.glance.appwidget.updateAll
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.claudeusage.app.Graph
