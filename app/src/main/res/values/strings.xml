@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Claude Usage</string>
+    <string name="widget_label">Claude Usage</string>
+    <string name="widget_description">See your Claude session and weekly limits at a glance.</string>
+
+    <!-- Notification channels -->
+    <string name="channel_resets_name">Limit resets</string>
+    <string name="channel_resets_desc">Alerts when your Claude session or weekly limits reset.</string>
+    <string name="channel_status_name">Background refresh</string>
+    <string name="channel_status_desc">Silent updates that keep your usage in sync.</string>
+</resources>

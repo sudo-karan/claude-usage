@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Never back up the encrypted token store or its master-key material. -->
+    <exclude domain="sharedpref" path="claude_secure_tokens.xml" />
+    <exclude domain="sharedpref" path="claude_secure_tokens.xml.bak" />
+</full-backup-content>

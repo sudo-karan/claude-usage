@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme. Compose draws the UI; this only needs to cover
+         the window background, status/navigation bars and the splash window. -->
+    <style name="Theme.ClaudeUsage" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/ink_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:enforceStatusBarContrast">false</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+    </style>
+
+    <!-- SplashScreen API (androidx.core:core-splashscreen) -->
+    <style name="Theme.ClaudeUsage.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/ink_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.ClaudeUsage</item>
+    </style>
+</resources>
