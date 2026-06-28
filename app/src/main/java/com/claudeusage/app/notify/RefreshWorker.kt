@@ -34,14 +34,19 @@ class RefreshWorker(
     private fun notifyResets(snapshot: UsageSnapshot, cache: com.claudeusage.app.data.UsageCache) {
         if (!snapshot.isLive) return // never alert on sample data
         for (meter in snapshot.meters) {
-            if (meter.resetAtEpochMs <= 0L) continue
-            val seen = cache.lastNotifiedReset(meter.id)
-            when {
-                seen == 0L -> cache.setLastNotifiedReset(meter.id, meter.resetAtEpochMs)
-                meter.resetAtEpochMs > seen -> {
-                    Notifier.notifyReset(applicationContext, meter)
-                    cache.setLastNotifiedReset(meter.id, meter.resetAtEpochMs)
-                }
+            val now = meter.usedFraction.coerceIn(0f, 1f)
+            val prev = cache.lastSeenFraction(meter.id)
+            cache.setLastSeenFraction(meter.id, now)
+
+            // Detect a *real* reset: usage was meaningfully consumed and has now
+            // dropped back toward zero. We deliberately key off the usage fraction
+            // rather than the reset timestamp — the captured reset time can drift
+            // forward while usage is still high (which previously caused false
+            // "limit reset" alerts at 100%).
+            if (prev < 0f) continue // first observation for this meter
+            val didReset = prev >= 0.20f && now <= 0.10f
+            if (didReset) {
+                Notifier.notifyReset(applicationContext, meter)
             }
         }
     }
