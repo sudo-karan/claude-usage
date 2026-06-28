@@ -3,4 +3,6 @@
     <!-- Never back up the encrypted token store or its master-key material. -->
     <exclude domain="sharedpref" path="claude_secure_tokens.xml" />
     <exclude domain="sharedpref" path="claude_secure_tokens.xml.bak" />
+    <exclude domain="sharedpref" path="claude_web_session.xml" />
+    <exclude domain="sharedpref" path="claude_web_session.xml.bak" />
 </full-backup-content>

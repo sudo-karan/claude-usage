@@ -14,8 +14,9 @@ one-tap **Ping Claude** button that opens a fresh chat to start a new session.
 - **Usage dashboard** — each limit gets its own progress bar in a distinct accent
   colour (coral / periwinkle / teal) so adjacent bars never blend, plus the
   percent used and a live reset countdown.
-- **Sign in with Claude** — OAuth (PKCE) login using the same flow as Claude Code.
-  Your password never touches the app; tokens are stored encrypted at rest.
+- **Sign in with Claude** — log into **claude.ai in an embedded WebView** with your
+  own account. The app then reads your usage from your own authenticated session
+  (cookies stored encrypted at rest); no OAuth client is impersonated.
 - **Home-screen widget** — a resizable Glance widget mirroring the dashboard, with
   its own **Ping** pill.
 - **Reset notifications** — a background worker watches your windows and notifies
@@ -51,28 +52,35 @@ You need the Android SDK (Android Studio or command-line tools):
 
 ## How sign-in & usage work
 
-The dashboard data comes from signing in with your Claude subscription via OAuth
-(PKCE, no client secret), mirroring Claude Code. After you approve access in the
-browser you paste the returned code back into the app; tokens are then refreshed
-automatically.
+You sign in to **claude.ai inside an embedded WebView** with your own account.
+While you're signed in, the app:
 
-> **Heads-up — unofficial endpoint.** The Session/Weekly usage figures are not a
-> formally documented public API. The relevant endpoints live in one place,
-> [`OAuthConfig.kt`](app/src/main/java/com/claudeusage/app/auth/OAuthConfig.kt),
-> and the response is parsed leniently in
-> [`UsageResponseParser.kt`](app/src/main/java/com/claudeusage/app/data/UsageResponseParser.kt).
-> If Anthropic changes the flow, update those two files — everything else keeps
-> working, and the app falls back to the last known / sample data in the meantime.
+1. Watches the page's own `fetch`/`XHR` traffic (a small injected hook) and
+   captures whatever usage payload claude.ai loads for your session — see
+   [`WebLoginActivity.kt`](app/src/main/java/com/claudeusage/app/web/WebLoginActivity.kt)
+   and [`UsageCaptureBridge.kt`](app/src/main/java/com/claudeusage/app/web/UsageCaptureBridge.kt).
+2. Saves your session cookies (encrypted) so the widget and background worker can
+   refresh headlessly via [`ClaudeWebUsageDataSource.kt`](app/src/main/java/com/claudeusage/app/data/ClaudeWebUsageDataSource.kt).
+
+The response is parsed leniently in
+[`UsageResponseParser.kt`](app/src/main/java/com/claudeusage/app/data/UsageResponseParser.kt),
+so minor shape changes won't crash the app.
+
+> **Heads-up — unofficial endpoints.** This relies on claude.ai's internal web
+> API, which is not a documented public contract. It uses *your own* logged-in
+> session (nothing is impersonated), but Anthropic can change the site at any
+> time. If live numbers stop appearing, the app falls back to the last known /
+> sample data, and the capture/parse logic above is where you'd adjust.
 
 ## Project layout
 
 ```
 app/src/main/java/com/claudeusage/app/
-├── auth/        OAuth (PKCE), encrypted token store, redirect handling
-├── data/        Repository, API client, lenient parser, cache, sample data
+├── web/         WebView claude.ai login, JS capture bridge, encrypted session
+├── data/        Repository, headless usage fetch, lenient parser, cache, sample
 ├── notify/      Reset notifications, WorkManager scheduling, boot receiver
 ├── ping/        "Ping Claude" deep-link
-├── ui/          Compose dashboard, theme, sign-in sheet, ViewModel
+├── ui/          Compose dashboard, theme, ViewModel
 ├── widget/      Glance home-screen widget
 ├── ClaudeUsageApp.kt
 └── MainActivity.kt

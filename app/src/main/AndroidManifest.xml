@@ -30,21 +30,13 @@
             </intent-filter>
         </activity>
 
-        <!-- Receives the OAuth redirect (custom scheme). The browser hands the
-             authorization code back to this activity, which finishes immediately
-             after forwarding the result to the auth layer. -->
+        <!-- WebView sign-in to claude.ai (the user's own session). -->
         <activity
-            android:name=".auth.OAuthRedirectActivity"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="claudeusage" android:host="oauth" />
-            </intent-filter>
-        </activity>
+            android:name=".web.WebLoginActivity"
+            android:exported="false"
+            android:label="Sign in to claude.ai"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- Home-screen widget -->
         <receiver
